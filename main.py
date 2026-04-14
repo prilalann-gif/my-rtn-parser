@@ -1,13 +1,24 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware # Импортируем прослойку
 from playwright.async_api import async_playwright
 
 app = FastAPI()
 
+# --- ДОБАВЬ ЭТОТ БЛОК ---
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # Разрешает запросы с любых адресов. Для разработки это ок.
+    allow_credentials=True,
+    allow_methods=["*"], # Разрешает все методы (GET, POST и т.д.)
+    allow_headers=["*"], # Разрешает любые заголовки
+)
+# ------------------------
 
 @app.get("/verify")
 async def verify_rtn(protocol_number: str):
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        # Твой существующий код...
+        browser = await p.chromium.launch(headless=True, args=["--no-sandbox"]) # На Railway часто нужен --no-sandbox
         page = await browser.new_page()
 
         # 1. Переход на страницу
